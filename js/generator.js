@@ -63,12 +63,38 @@ async function checkBalance(){
    const addr = document.getElementById('addressText').innerText;
    document.getElementById('balance').innerText = 'Checking...';
    try{
-       let res = await fetch(`https://blockstream.info/api/address/${addr}`);
-       let data = await res.json();
+       if(!addr){
+           document.getElementById('balance').innerText = 'Generate or restore a wallet first.';
+           return;
+       }
+
+       const endpoints = [
+           `https://mempool.space/api/address/${addr}`,
+           `https://blockstream.info/api/address/${addr}`
+       ];
+
+       let data;
+
+       for(const url of endpoints){
+           try {
+               const res = await fetch(url);
+               if(res.ok){
+                   data = await res.json();
+                   break;
+               }
+           } catch(err) {
+               continue;
+           }
+       }
+
+       if(!data){
+           throw new Error('Unable to fetch balance');
+       }
+
        let sats = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum;
        document.getElementById('balance').innerText = `${sats/1e8} BTC (${sats} sats)`;
    } catch(e){
-       document.getElementById('balance').innerText = 'Error fetching balance.';
+       document.getElementById('balance').innerText = 'Error fetching balance. Please try again later.';
    }
 }
 
