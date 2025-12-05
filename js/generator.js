@@ -1,4 +1,6 @@
 
+const bitcoin = window.bitcoinjs || window.bitcoin;
+
 function showModal(){document.getElementById('modal-bg').classList.remove('hidden');}
 function closeModal(){document.getElementById('modal-bg').classList.add('hidden');}
 
@@ -17,24 +19,29 @@ async function generateWallet(){
 }
 
 async function deriveWallet(seedPhrase){
+   if(!bitcoin || !bitcoin.bip32){
+      document.getElementById('addressText').innerText = 'Wallet library failed to load.';
+      return;
+   }
+
    let seed = await bip39.mnemonicToSeed(seedPhrase);
-   let root = bitcoinjs.bip32.fromSeed(seed);
+   let root = bitcoin.bip32.fromSeed(seed);
    let type = document.getElementById('addressType').value;
    let child, pay;
 
    if(type === 'p2wpkh'){
       child = root.derivePath("m/84'/0'/0'/0/0");
-      pay = bitcoinjs.payments.p2wpkh({pubkey:child.publicKey, network:bitcoinjs.networks.bitcoin});
+      pay = bitcoin.payments.p2wpkh({pubkey:child.publicKey, network:bitcoin.networks.bitcoin});
    }
    if(type === 'p2pkh'){
       child = root.derivePath("m/44'/0'/0'/0/0");
-      pay = bitcoinjs.payments.p2pkh({pubkey:child.publicKey, network:bitcoinjs.networks.bitcoin});
+      pay = bitcoin.payments.p2pkh({pubkey:child.publicKey, network:bitcoin.networks.bitcoin});
    }
    if(type === 'p2tr'){
       child = root.derivePath("m/86'/0'/0'/0/0");
-      pay = bitcoinjs.payments.p2tr({
+      pay = bitcoin.payments.p2tr({
          internalPubkey: child.publicKey.subarray(1,33),
-         network: bitcoinjs.networks.bitcoin
+         network: bitcoin.networks.bitcoin
       });
    }
 
@@ -47,7 +54,9 @@ async function deriveWallet(seedPhrase){
 }
 
 function updateAddressType(){
-   deriveWallet(currentMnemonic);
+   if(currentMnemonic){
+      deriveWallet(currentMnemonic);
+   }
 }
 
 async function checkBalance(){
