@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AdaptBTC Wallet Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bitcoinjs-lib/6.1.0/bitcoinjs-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bip39/3.0.4/bip39.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+<header>
+   <img src="assets/logo.png" class="logo">
+</header>
+
+<section class="hero">
+   <h1>Bitcoin Wallet Generator</h1>
+   <p>Create secure BTC wallets instantly. Your seed never leaves your device.</p>
+   <button class="primary-btn" onclick="showModal(); generateWallet()">Generate New Wallet</button>
+</section>
+
+<section id="walletCard" class="card hidden animate-scale">
+   <label>Wallet Type</label>
+   <select id="addressType" onchange="updateAddressType()">
+      <option value="p2wpkh">SegWit (bc1)</option>
+      <option value="p2pkh">Legacy (1)</option>
+      <option value="p2tr">Taproot (bc1p)</option>
+   </select>
+
+   <label>Seed Phrase</label>
+   <div class="value-box"><span id="mnemonicText"></span></div>
+   <button class="copy-btn" onclick="copyText('mnemonicText')">Copy Seed Phrase</button>
+
+   <label>Bitcoin Address</label>
+   <div class="value-box"><span id="addressText"></span></div>
+   <button class="copy-btn" onclick="copyText('addressText')">Copy Address</button>
+
+   <div id="qr" class="qr animate-scale"></div>
+
+   <label>Private Key (WIF)</label>
+   <div class="value-box"><span id="privateKeyText"></span></div>
+   <button class="copy-btn" onclick="copyText('privateKeyText')">Copy Private Key</button>
+
+   <button onclick="checkBalance()" class="secondary-btn">Check Balance</button>
+   <div class="value-box" id="balance">Balance not checked.</div>
+
+</section>
+
+<section class="restore">
+   <h2>Restore Wallet</h2>
+   <textarea id="restoreInput" placeholder="Enter 12-word seed phrase…"></textarea>
+   <button class="primary-btn" onclick="restoreWallet()">Restore</button>
+</section>
+
+<div id="modal-bg" class="modal-bg hidden">
+  <div class="modal animate-scale">
+     <h2>⚠️ Important</h2>
+     <p>Your seed phrase appears once. Save it safely.</p>
+     <button onclick="closeModal()" class="primary-btn">I Understand</button>
+  </div>
+</div>
+
+<script src="js/generator.js"></script>
+</body>
+</html>
